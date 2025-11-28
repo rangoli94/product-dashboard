@@ -1,131 +1,97 @@
-import React, { useEffect, useState } from "react";
-// import useDebounce from "../../customHooks";
-import { useSearchParams } from "react-router-dom";
-import { highlight } from "./highlight";
-import useDebounce from "../../customHooks/useDebounce";
+import React, { useContext, useEffect, useState } from 'react'
+import useDebounce from '../../customHooks/useDebounce';
+import type { Product } from '../../types/products';
+import './index.css'
+import { SearchResultContext } from '../../context/SearchResultContext';
+import { highlight } from './highlight';
+import { useSearchParams } from 'react-router-dom';
 
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-}
+function SearchBar() {
+    // const [searchParam, setSearchParam] = useState("")
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [query, setQuery] = useState("");
+    
+    // const [results, setResults] = useState<Product[]>([]);
+    const searchResultContext = useContext(SearchResultContext);
 
-export default function SearchBar() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  
-  const initialQuery = searchParams.get("q") || "";
-
-  const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const debouncedQuery = useDebounce(query, 300);
-
-  // Update URL when user types
-  useEffect(() => {
-    if (debouncedQuery) {
-      setSearchParams({ q: debouncedQuery });
-    } else {
-      setSearchParams({});
-    }
-  }, [debouncedQuery]);
-
-  // Fetch results from API
-  useEffect(() => {
-    if (debouncedQuery.trim().length === 0) {
-      setResults([]);
-      return;
+    if(!searchResultContext) {
+        throw new Error("context does not exist")
     }
 
-    const fetchSearch = async () => {
-      setLoading(true);
+    const { results, setResults } = searchResultContext
+    const [loading, setLoading] = useState(false);
 
-      const res = await fetch(
-        `https://dummyjson.com/products/search?q=${debouncedQuery}`
-      );
-      const data = await res.json();
+    const debouncedQuery = useDebounce(query, 300); 
 
-      setResults(
-        data.products.filter(
-          (p: Product) =>
-            p.title.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
-            p.description.toLowerCase().includes(debouncedQuery.toLowerCase())
-        )
-      );
-
-      setLoading(false);
+    const updateQuery = (value: string) => {
+        setSearchParams({ q: value }); // updates URL ?q=value
     };
 
-    fetchSearch();
-  }, [debouncedQuery]);
+    useEffect(() => {
+        updateQuery(query)
+    },[results])
 
-  const clearSearch = () => {
-    setQuery("");
-    setResults([]);
-    setSearchParams({});
-  };
+    useEffect(() => {
+        if (debouncedQuery.trim().length === 0) {
+          setResults([]);
+          return;
+        }
+    
+        const fetchSearch = async () => {
+          setLoading(true);
+    
+          const res = await fetch(
+            `https://dummyjson.com/products/search?q=${debouncedQuery}`
+          );
+          const data = await res.json();
+
+        setResults(data.products)
+    
+          setLoading(false);
+        };
+    
+        fetchSearch();
+      }, [debouncedQuery]);
+
+    const handleProductClick = (result: Product) => {
+        setResults([result])
+    }
+
+    const clearSearch = () => {
+        setQuery("");
+        setResults([]);
+        setSearchParams({});
+      };
 
   return (
-    <div style={{ width: "400px", margin: "20px auto" }}>
-      {/* Search Input */}
-      <div style={{ position: "relative" }}>
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px 35px 10px 10px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-            fontSize: "16px"
-          }}
-        />
-
-        {/* Clear Button (X) */}
+    <div>
+        <input type="text"  
+            placeholder="Search products..."
+            value={query} onChange={(e) => setQuery(e.target.value)}/>
+        
         {query && (
           <button
             onClick={clearSearch}
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              border: "none",
-              background: "transparent",
-              fontSize: "18px",
-              cursor: "pointer"
-            }}
+
           >
-            ×
+            X
           </button>
         )}
-      </div>
 
-      {/* Searching Indicator */}
-      {loading && <p style={{ marginTop: "10px" }}>🔍 Searching...</p>}
-
-      {/* Results */}
-      <div style={{ marginTop: "15px" }}>
-        {results.map((p) => (
-          <div
-            key={p.id}
-            style={{
-              padding: "10px",
-              background: "#f8f8f8",
-              marginBottom: "10px",
-              borderRadius: "8px",
-              color: "black"
-            }}
-          >
-            <h4>{highlight(p.title, debouncedQuery)}</h4>
-            <p>{highlight(p.description, debouncedQuery)}</p>
-            <strong>${p.price}</strong>
-          </div>
-        ))}
-      </div>
+        {loading && <p className='search-results'>Searching...</p>}
+        {results.length > 0 && (<div className='search-results'>
+            {
+                results.map(result => (
+                    <div key={result.id} style={{borderBottom: '1px solid black'}} onClick={() => handleProductClick(result)}>
+                        <p>Title: {highlight(result.title, query)}</p>
+                        <p>Description: {highlight(result.description, query)}</p>
+                    </div>
+                ))
+            }
+        </div>)}
     </div>
-  );
+
+  )
 }
+
+export default SearchBar

@@ -4,17 +4,20 @@ import Body from './components/Body'
 import Header from './components/Header'
 import LeftPanel from './components/LeftPanel'
 import { LayoutProvider } from './context/LayoutContext'
+import { SearchResultProvider } from './context/SearchResultContext'
 
 function App() {
 
   return (
     <BrowserRouter>
       <LayoutProvider>
-        <Header />
-        <div className='layout'>
-          <LeftPanel />
-          <Body />
-        </div>
+        <SearchResultProvider>
+          <Header />
+          <div className='layout'>
+            <LeftPanel />
+            <Body />
+          </div>
+        </SearchResultProvider>
       </LayoutProvider>
     </BrowserRouter>
   )

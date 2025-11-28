@@ -24,7 +24,7 @@ function Header() {
      <h3>E-Commerce DASHBOARD</h3>
     </div>
     <div className='header-actions'>
-      {/* <SearchBar /> */}
+      <SearchBar />
       <button onClick={toggleLayout}>{layout}</button>
       <div>Compare</div>
     </div>

@@ -6,18 +6,22 @@ import './index.css'
 import { LayoutContext } from "../../context/LayoutContext"
 import { usePagination } from "../../customHooks/usePagination"
 import PaginationPanel from "../PaginationPanel"
+import { SearchResultContext } from "../../context/SearchResultContext"
 
 
 const Body = () => {
 
   const [products, setProducts] = useState<Product[]>([])
+  const searchResultContext = useContext(SearchResultContext)
   const layoutContext = useContext(LayoutContext)
 
-  if(!layoutContext) {
+  if(!layoutContext || !searchResultContext) {
     return
   }
 
   const { layout } = layoutContext 
+
+  const {results } = searchResultContext
 
   const {
     currentItems,
@@ -26,7 +30,7 @@ const Body = () => {
     nextPage,
     prevPage,
     goToPage,
-  } = usePagination(products, 20);
+  } = usePagination(results.length > 0 ? results :  products, 20);
 
   const [comparisonList, setComparisonList] = useState<Product[]>([])
 

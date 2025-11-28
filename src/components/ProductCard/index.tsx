@@ -44,7 +44,7 @@ const ProductCard = ({ product, isChecked, onClickCheckboxHandler }: { product: 
       <h3>{product.title}</h3>
       <p>{product.description}</p>
       <p>Price: ${product.price}</p>
-      <p>Rating: {product.rating} <StarRating rating={product.rating}/></p>
+      <div>Rating: {product.rating} <StarRating rating={product.rating}/></div>
       <p>Stock: {product.stock}<BadgeComponent badgeValue={badgeValue} badgeColor={badgeColor} /></p>
       
       <label style={{
