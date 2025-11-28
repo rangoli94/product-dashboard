@@ -1,0 +1,11 @@
+.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.list-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

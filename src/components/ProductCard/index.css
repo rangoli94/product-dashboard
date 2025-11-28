@@ -1,0 +1,26 @@
+.product-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: x-small;
+}
+
+.product-card__image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-card.list-view {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.product-card.list-view .product-card__image {
+  width: 120px;  /* small thumbnail */
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
